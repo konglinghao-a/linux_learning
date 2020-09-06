@@ -128,18 +128,114 @@
 ### 安装 VirtualBox
 
 - VirtualBox 是一款开源虚拟机软件，免费
-- **在 Windows 下面下载需要进入 BIOS 开启虚拟化**
+- **在 Windows 下面下载需要进入 BIOS 开启虚拟化**（我的好像不用）
 
 **VirtualBox对比 VMWare**
 
 - VMWare 的各种版本，安装文件很大；VirtualBox 占用资源少
 - VMWare 收费
 
-### 在虚拟机中安装 CentOS
+### 创建虚拟机
 
+![](./media/1.png)
 
+![](./media/2.png)
 
+![](./media/3.png)
 
+![](./media/4.png)
+
+![](./media/5.png)
+
+![](./media/6.png)
+
+### 在虚拟机中安装 centos 系统
+
+![](./media/7-1.png)
+
+![](./media/7-2.png)
+
+![](./media/7.png)
+
+![](./media/8.png)
+
+![](./media/9.png)
+
+![](./media/10.png)
+
+![](./media/11.png)
+
+![](./media/12.png)
+
+![](./media/13.png)
+
+![](./media/14.png)
+
+![](./media/15.png)
+
+![](./media/16.png)
+
+![](./media/17.png)
+
+![](./media/18.png)
+
+![](./media/19.png)
+
+![](./media/20.png)
+
+![](./media/21.png)
+
+![](./media/22.png)
+
+![](./media/23.png)
+
+![](./media/24.png)
+
+![](./media/25.png)
+
+![](./media/26.png)
+
+![](./media/27.png)
+
+![](./media/28.png)
+
+![](./media/29.png)
+
+![](./media/30.png)
+
+![](./media/31.png)
+
+![](./media/32.png)
+
+![](./media/33.png)
+
+![](./media/34.png)
+
+## 1-6 配置虚拟机中的 CentOS
+
+![](./media/35.png)
+
+![](./media/36.png)
+
+![](./media/37.png)
+
+![](./media/38.png)
+
+![](./media/39.png)
+
+### 安装增强功能
+
+![](./media/40.png)
+
+若出现了错误：
+
+> VirtualBox安装增强功能时报错：未能加载虚拟光盘 到虚拟电脑
+
+那就进入命令行，然后输入 eject 命令来弹出光盘，然后再执行安装增强功能（重启以后才有用）。
+
+![](./media/41.png)
+
+![](./media/42.png)
 
 # 2、Linux基础知识和命令
 
