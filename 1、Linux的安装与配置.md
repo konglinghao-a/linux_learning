@@ -137,95 +137,95 @@
 
 ### 创建虚拟机
 
-![](D:/1mynotes/linux/media/1.png)
+![](./media/1.png)
 
-![](D:/1mynotes/linux/media/2.png)
+![](./media/2.png)
 
-![](D:/1mynotes/linux/media/3.png)
+![](./media/3.png)
 
-![](D:/1mynotes/linux/media/4.png)
+![](./media/4.png)
 
-![](D:/1mynotes/linux/media/5.png)
+![](./media/5.png)
 
-![](D:/1mynotes/linux/media/6.png)
+![](./media/6.png)
 
 ### 在虚拟机中安装 centos 系统
 
-![](D:/1mynotes/linux/media/7-1.png)
+![](./media/7-1.png)
 
-![](D:/1mynotes/linux/media/7-2.png)
+![](./media/7-2.png)
 
-![](D:/1mynotes/linux/media/7.png)
+![](./media/7.png)
 
-![](D:/1mynotes/linux/media/8.png)
+![](./media/8.png)
 
-![](D:/1mynotes/linux/media/9.png)
+![](./media/9.png)
 
-![](D:/1mynotes/linux/media/10.png)
+![](./media/10.png)
 
-![](D:/1mynotes/linux/media/11.png)
+![](./media/11.png)
 
-![](D:/1mynotes/linux/media/12.png)
+![](./media/12.png)
 
-![](D:/1mynotes/linux/media/13.png)
+![](./media/13.png)
 
-![](D:/1mynotes/linux/media/14.png)
+![](./media/14.png)
 
-![](D:/1mynotes/linux/media/15.png)
+![](./media/15.png)
 
-![](D:/1mynotes/linux/media/16.png)
+![](./media/16.png)
 
-![](D:/1mynotes/linux/media/17.png)
+![](./media/17.png)
 
-![](D:/1mynotes/linux/media/18.png)
+![](./media/18.png)
 
-![](D:/1mynotes/linux/media/19.png)
+![](./media/19.png)
 
-![](D:/1mynotes/linux/media/20.png)
+![](./media/20.png)
 
-![](D:/1mynotes/linux/media/21.png)
+![](./media/21.png)
 
-![](D:/1mynotes/linux/media/22.png)
+![](./media/22.png)
 
-![](D:/1mynotes/linux/media/23.png)
+![](./media/23.png)
 
-![](D:/1mynotes/linux/media/24.png)
+![](./media/24.png)
 
-![](D:/1mynotes/linux/media/25.png)
+![](./media/25.png)
 
-![](D:/1mynotes/linux/media/26.png)
+![](./media/26.png)
 
-![](D:/1mynotes/linux/media/27.png)
+![](./media/27.png)
 
-![](D:/1mynotes/linux/media/28.png)
+![](./media/28.png)
 
-![](D:/1mynotes/linux/media/29.png)
+![](./media/29.png)
 
-![](D:/1mynotes/linux/media/30.png)
+![](./media/30.png)
 
-![](D:/1mynotes/linux/media/31.png)
+![](./media/31.png)
 
-![](D:/1mynotes/linux/media/32.png)
+![](./media/32.png)
 
-![](D:/1mynotes/linux/media/33.png)
+![](./media/33.png)
 
-![](D:/1mynotes/linux/media/34.png)
+![](./media/34.png)
 
 ## 1-6 配置虚拟机中的 CentOS
 
-![](D:/1mynotes/linux/media/35.png)
+![](./media/35.png)
 
-![](D:/1mynotes/linux/media/36.png)
+![](./media/36.png)
 
-![](D:/1mynotes/linux/media/37.png)
+![](./media/37.png)
 
-![](D:/1mynotes/linux/media/38.png)
+![](./media/38.png)
 
-![](D:/1mynotes/linux/media/39.png)
+![](./media/39.png)
 
 ### 安装增强功能
 
-![](D:/1mynotes/linux/media/40.png)
+![](./media/40.png)
 
 若出现了错误：
 
@@ -233,6 +233,6 @@
 
 那就进入命令行，然后输入 eject 命令来弹出光盘，然后再执行安装增强功能（重启以后才有用）。
 
-![](D:/1mynotes/linux/media/41.png)
+![](./media/41.png)
 
 ![](./media/42.png)
