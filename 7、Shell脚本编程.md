@@ -419,15 +419,361 @@ fi
 
 **测试文件**
 
-| 条件     | 意义 |
-| -------- | ---- |
-| -e $file |      |
-|          |      |
-|          |      |
-|          |      |
-|          |      |
-|          |      |
-|          |      |
-|          |      |
-|          |      |
+| 条件              | 意义                                     |
+| ----------------- | ---------------------------------------- |
+| -e $file          | exist；文件是否存在                      |
+| -d $file          | directory；文件是否是一个目录            |
+| -f $file          | file 文件是否是要给文件                  |
+| -L $file          | link；文件是否是一个符号链接文件         |
+| -r $file          | readable；文件是否可读                   |
+| -w $file          | writable；文件是否可写                   |
+| -x $file          | executable；文件是否可执行               |
+| $file1 -nt $file2 | newer than；文件 file1 是否比 file2 更新 |
+| $file1 -ot $file2 | older than；文件 file1 是否比 file2 更旧 |
+
+**测试多个条件**
+
+| 符号 | 意义 |
+| ---- | ---- |
+| &&   | 与   |
+| \|\| | 或   |
+
+```shell
+#!/bin/bash
+# 注意一下 && 写的位置
+if [ $# -ge 1 ] && [ $1 = 'love' ]
+then
+	echo "great !"
+	echo "you know the password"
+else
+	echo "you do not know the password"
+fi
+```
+
+### case：测试多个条件
+
+```shell
+#!/bin/bash
+
+case $1 in
+	"Matthew")
+		echo "hello Matthew!"
+		;;
+	"Mark")
+		echo "hello Mark"
+		;;
+	"Luke")
+		echo "hello Luke"
+		;;
+	"John")
+		echo "hello John"
+		;;
+	*)
+		echo "sorry, I do not know you"
+		;;
+esac
+```
+
+- 也可以在 case 中做或的判断，但不是用两根竖线（||），而是一根竖线（|）
+
+```shell
+#!/bin/bash
+
+case $1 in
+	"dog" | "cat" | "pig")
+		echo "it is a mammal"
+		;;
+	"pigeon" | "swallow")
+		echo "it is a bird"
+		;;
+	*)
+		echo "I do not know what it is"
+		;;
+esac
+```
+
+## 7-5 shell 的循环语句
+
+主要的循环语句有三种：
+
+- while 循环
+- until 循环
+- for 循环
+
+### while 循环
+
+```shell
+# while 循环的逻辑
+while [ 条件测试 ]
+do 
+	做某些事
+done
+```
+
+```shell
+#!/bin/bash
+
+while [ -z $response] || [ $response != 'yes' ]
+do 
+	read -p 'say yes: ' response
+done
+```
+
+### until 循环
+
+- 和 while 正好相反
+
+```shell
+#!/bin/bash
+until [ "$response" = 'yes' ]
+do
+	read -p 'say yes：' response
+done
+```
+
+### for 循环
+
+```shell
+# for 循环的基本逻辑：遍历列表
+for 变量 in '值1' '值2' ... '值n'
+do 
+	做某些事
+done
+```
+
+```shell
+#!/bin/bash
+
+for animal in 'dog' 'cat' 'pig'
+do
+	echo "animal being analyzed：$animal"
+done
+```
+
+```shell
+#!/bin/bash
+
+listfile=`ls` # 这里的 listfile 就等于 ls 命令运行的结果
+
+for file in $listfile
+do 
+	echo "file found: $file"
+done
+```
+
+### 更常规的 for 循环
+
+- 可以借助 seq （sequence 序列）命令，来实现类似主流编程语言中的 for 循环的语法
+
+```shell
+#!/bin/bash
+
+for i in `seq 1 10` # 这回返回 1~10 的数
+do
+	echo $i
+done
+
+for i in `seq 1 2 10` # 这回返回 1~10 之间的数，取值间隔为 2
+do
+	echo $i
+done
+```
+
+
+
+## 7-6 shell 的函数
+
+### 函数的定义
+
+**定义（或创建）shell 函数的方式1**
+
+- 函数名后面跟着的圆括号里**不加任何参数**
+- 函数的完整定义必须置于函数的调用之前
+
+```shell
+函数名 () {
+	函数体
+}
+```
+
+```shell
+#!/bin/bash
+
+print_something () {
+	echo "hello, I am a function"
+}
+
+print_something
+print_something
+```
+
+**定义（或创建）shell 函数的方式2**
+
+```shell
+function 函数名 {
+	函数体
+}
+```
+
+### 传递参数
+
+```shell
+#!/bin/bash
+# shell 的函数参数放在执行的时候传递，函数体里用 $1 等来用就是了
+print_something () {
+	echo hello $1
+}
+
+print_something Matthew
+print_something Mark
+print_something Luke
+
+```
+
+### 返回值
+
+- shell 函数没办法做到返回值，但是可以返回一个**状态**
+- shell 函数返回状态也用 return 这个关键字
+
+```shell
+#!/bin/bash
+print_something () {
+	echo hello $1
+	return 1
+}
+
+print_something luke
+print_something johe
+echo return value of previous function is $? # $? 返回前一个函数运行完后的状态（1）
+```
+
+如果想要函数返回一个计算的值
+
+```shell
+#!/bin/bash
+lines_in_file () {
+	cat $1 | wc -l # 利用管道，用 wc 来统计行数，行数会被打印出来
+}
+
+line_num=$(lines_in_file $1)
+
+echo the file $1 has $line_num lines
+
+```
+
+### 变量的作用范围
+
+- 默认来说，一个变量是“全局的”
+- 要定义一个局部变量，需要用 local 关键字
+
+```shell
+#!/bin/bash
+
+local_global () {
+	local var1='local 1'
+	echo Inside function: var1 is $var1 ; var2 is $var2
+	var1='changed again' # 这里的 var1 是函数中定义的局部变量
+	var2='2 changed again' # 这里的 var2 是函数外定义的全局变量
+}
+var1='global1'
+var2='global2'
+echo Before function call: var1 is $var1 ；var2 is $var2
+local_global
+echo After function call：var1 is $var1 ；var2 is $var2
+
+# 运行的结果：
+# Before function call: var1 is global1 ；var2 is global2
+# Inside function: var1 is local 1 ; var2 is global2
+# After function call：var1 is global1 ；var2 is 2 changed again
+```
+
+### 重载命令
+
+- 可以用函数来实现命令的重载，也就是说把函数的名字取成与我们通常在命令行用的命令相同的名字
+- 重载命令的关键字：**command**
+
+```shell
+#!/bin/bash
+
+ls () {
+	command ls -lh # 如果没有 command，那就会无限循环
+}
+
+ls
+```
+
+### 函数的设计
+
+- 单一职责，别让一个函数干太多工作
+
+
+
+## 7-7 shell 实现图片展示网页
+
+### 实现的项目
+
+- 创建一个网页，这个网页展示一系列图片
+- 展示的图片是存放在本地的一个文件夹里面
+
+### 脚本文件要做的事
+
+- 根据目录中的每张图片，生成对应的缩略图
+- 生成一个 html 文件，把缩略图都插入其中
+- 给每张缩略图绑定一个链接，会链接到原始图片
+
+### 生成缩略图
+
+- 缩略图的英文是 thumbnail，代表网页上或计算机中图片经压缩方式处理后的小图，其中通常会包含指向完整尺寸的超链接
+- **convert 命令**：可以帮助我们从图片生成缩略图 thumbnail
+  - centos 里面没有这个命令；这个命令属于 ImageMagick 这个软件包
+  - 安装：**sudo yum install ImageMagick**
+- **-thumbnail 参数**：要生成缩略图，convert 命令后面要加这个参数
+
+`gallery.sh`
+
+```shell
+#!/bin/bash
+
+# Verification of parameter
+# If no parameter，use a default value
+if [ -z $1 ]
+then 
+	output='gallery.html'
+else 
+	output=$1
+fi
+
+# Preparation of files and folders
+echo '' > $output # 确认脚本文件被清空
+if [ ! -e thumbnails]
+then
+	mkdir thumbnails
+fi
+
+# Beginning of HTML（HTML 文件的开头）
+echo '<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	<body>
+		<p>' >> $output
+		
+# Generation of thumbnails and the html web page （生成图片的缩略图和 html 的页面主体）
+for image in `ls *.png *.jpg *.jpeg *.gif 2>/dev/null`
+do
+	convert $image -thumbnail '200*200>' thumbnails/$iamge
+	echo ' <a href="'$image'"><img src="thumbnails/'$image'" alt=""/></a>' >> $output
+done
+
+# End of HTML（HTML 文件的结尾）
+echo ' <p>
+	</body>
+</html>' >> $output
+```
+
+
+
+## 7-8 用 shell 做统计练习
+
+
 

@@ -402,6 +402,11 @@ less 命令中最基本最常用的快捷键：
 - cp *.txt folder ：把当前目录下所有 txt 文件拷贝到 folder 目录中
 - cp ha* folder：把当前目录以 ha 开头的文件都拷贝到 folder 目录中
 
+复制多个文件
+
+- cp {filename1,filename2,...} 目标文件夹/
+- 注意：必须移动到文件夹里面
+
 ### mv 命令
 
 - move，移动文件。有两个功能：
