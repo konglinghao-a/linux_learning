@@ -775,5 +775,38 @@ echo ' <p>
 
 ## 7-8 用 shell 做统计练习
 
+```shell
+#!/bin/bash
 
+# 确认参数
+if [ -z $1 ]
+then
+	echo "Please enter the file of dictionary!"
+	exit
+fi
+
+# 确认文件存在
+if [ ! -e $1 ]
+then
+	echo "Please make sure that the file of dictionary exists!"
+	exit
+fi
+
+# 函数定义
+statistics () {
+	for char in {a..z}
+	do
+		echo "$char - `grep -io "$char" $1 | wc -l`" | tr /a-z/ /A-Z/ >> tmp.txt # 后面这句话将小写都转成了大写
+	done
+	# -r：倒序排列
+	# -n：对数字排序
+	# -k 2：指定对第2列进行排序
+	# -t -：指定列与列之间用什么分隔符
+	sort -rn -k 2 -t - tmp.txt
+	rm tmp.txt
+}
+
+# 函数使用
+statistics $1
+```
 
