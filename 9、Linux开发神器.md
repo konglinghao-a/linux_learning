@@ -166,9 +166,7 @@ vim /var/lib/jenkins/hudson.model.UpdateCenter.xml
 - 启动：**nginx** 或 **systemctl start nginx**
 - 启动的时候可能会出错，因为 nginx 和 apache 一样默认都是绑定了 80 端口，我们可以先把 apache 停掉然后再去启动 nginx 。
 
-## 9-5 配置 nginx 作为反向代理服务器，虚拟主机配置，设置 HTTPS
-
-### 配置 Nginx
+## 9-5 修改 apache 监听其他端口
 
 ```shell
 # 首先让 apache 监听其他服务，不要默认监听 80 端口，进入 apache 的主配置文件
@@ -179,7 +177,7 @@ vim /etc/httpd/conf/httpd.conf
 
 ```shell
 # 修改下面监听的端口
-Listen 7808 http
+Listen 7080 http
 ```
 
 ```shell
@@ -191,5 +189,110 @@ vim /etc/httpd/conf.d/ssl.conf
 
 ```shell
 Listen 7443 https
+
+<VirtualHost _default_:7443>
 ```
 
+- 接下来重启 apach：**systemctl restart apache**
+- 这时候可能会出错，因为 SELinux 不肯放行这些端口（7080 和 7443），防火墙也没放行这些端口
+
+```shell
+# 查看允许的端口：
+semanage port -l | grep http
+
+# 添加端口
+semanage port -a -t http_port_t -p tcp 7080
+semanage port -a -t http_port_t -p tcp 7443
+
+# 防火墙放行
+firewall-cmd --zone=public --add-port=7080/tcp --permanent
+firewall-cmd --zone=public --add-port=7443/tcp --permanent
+firewall-cmd --reload
+
+# 然后再启动 apache 就能成功了，apache 监听的端口成功被我们改变了
+```
+
+- 接下来就可以配置 nginx 了；
+- 可以先用 **rpm -ql nginx** 来查看一下 nginx 的相关文件
+
+## 9-6 配置 Nginx 作为反向代理服务器，虚拟主机和 HTTPS 配置
+
+### 配置 nginx 作为反向代理服务器，虚拟主机
+
+打开 nginx 的配置文件：**vim /etc/nginx/nginx.conf**
+
+`/etc/nginx/nginx.conf`
+
+```shell
+# 在配置文件里面加上这么些东西：
+
+# 这些是针对 http 的；定义上游，对应了服务器的地址
+upsteam backend-jenkins {
+    server 127.0.0.1:8080;
+}
+upsteam backend-apache {
+    server 127.0.0.1:7080;
+}
+
+# 类似于 apache 里面的 virtualHost 虚拟主机的配置
+server {
+	#...
+
+	# 可以修改一下 server_name，改成我们要去访问的域名
+	server_name www.xxx.com xxx.com;
+	
+	# 加一下 location；一个用来反向代理 apache ，一个用来反向代理 jenkins
+	# proxy_pass 相当于转接的意思，如果我们去访问 /jenkins，就相当于是访问 127.0.0.1:8080
+	location / {
+		proxy_pass http://backend-apache;
+	}
+	location /jenkins {
+		proxy_pass http://backend-jenkins;
+	}
+	
+	#...
+}
+```
+
+### https 配置
+
+```shell
+# 首先复制一下证书
+pwd # /etc/nginx/pki
+
+mkdir pki
+cd pki
+# 把以前给 apache 配置的证书和私钥拷贝到当前目录
+cp /etc/httpd/pki/server.crt /etc/httpd/pki/server.key .
+```
+
+`/etc/nginx/nginx.conf`
+
+```shell
+# 这是 http 的 server 块
+server {
+	# 将原来的 location 删掉，然后做一个重定向
+	return 301 https://$host$request_uri;
+}
+
+# Settings for a TLS enabled server
+server {
+	#...
+	
+	# 修改一下证书和密钥的路径
+	ssl_certificate "/etc/nginx/pki/server.crt";
+	ssl_certificate_key "/etc/nginx/pki/server.key"
+	
+	# 把上面 http 的 server 里面的 location 删掉，在 https 的这个 server 里面加上：
+	location / {
+		proxy_pass http://backend-apache;
+	}
+	location /jenkins {
+		proxy_pass http://backend-jenkins;
+	}
+	
+	#...
+}
+```
+
+## 9-7 安装 Squid 作为代理服务器
