@@ -93,3 +93,103 @@ vim /etc/tomcat/tomcat-user.xml
 </tomcat-users>
 ```
 
+## 9-3 安装 Jenkins 持续集成软件
+
+- 下载 Jenkins 的 war 文件:  **wget http://mirrors.jenkins.io/war-stable/latest/jenkins.war**
+- 移动 war 文件：**mv jenkins.war /var/lib/tomcat/webapps**；要安装 jenkins 只需要将 jenkins.war 这个文件放到包含应用程序的目录，然后**重启 tomcat** 就会为我生成 jenkins 这个目录，这是自动部署的。
+- 然而，在经过上一步了以后可能没有看见 jenkins 这个目录（ls /var/lib/tomcat/webapp），这是因为受到 SELinux 的捣蛋（从主机下载了 war 文件，然后用 scp 命令传送到服务器的 root 目录下，安全上下文可能发生了改变。如果直接传送到 /var/lib/tomcat/webapp 目录可能安全上下文不变，那么就没有这个问题），我们可以看一看当前目录的安全上下文：
+
+```shell
+pwd # /var/lib/tomcat/webapps
+ls -Zd # 显示安全上下文
+# drwxrwxr-x. root tomcat system_y:object_r:tomcat_var_lib_t:s0 .
+
+# 看看 jenkins.war 这个文件的安全上下文
+ls -Zd jenkins.war
+# -rw-r--r--. root root unconfined_u:object_r:admin_home_t:s0 jenkins.war
+
+# 修改 jenkins 文件的安全上下文
+semanage fcontext -a -t tomcat_var_lib_t jenkins.war
+restorecon -Rv . # 当前目录去重载一下配置
+
+# 接下来它就会去自动部署，这样就生成了 jenkins 文件
+```
+
+- 接下来输入 192.168.1.101:8080/jenkins 就能看到一波显示
+- 这时候可能看到页面上显示了 offline，这是因为证书的关系，我们改成 http 就行了
+
+```shell
+vim /var/lib/jenkins/hudson.model.UpdateCenter.xml
+```
+
+`/var/lib/jenkins/hudson.model.UpdateCenter.xml`
+
+```shell
+# 修改成 http
+<url>http://updates.jenkins.io/update-center.json</url>
+```
+
+
+
+### jenkins 的运行
+
+- 可以直接运行：**java -jar jenkins.war**
+- 也可以修改端口运行：**java -jar jenkins.war --httpPort=8081**
+- 或者在 Tomcat 这样的 Servlet 容器里运行
+
+### Tomcat 的 Coyote Web 服务器的局限
+
+- Coyote Web 服务器不能用于直接服务客户端连接
+- 它在处理静态文件时效率较低
+- 并且本身不支持 HTTPS 协议
+
+解决方法：
+
+- 使用功能更强大的 web 服务器（例如 apache 或 nginx）作为代理服务器，将请求转发到 Tomcat
+- web 服务器将管理 https 连接、访问限制和静态页面，只有对 java 应用程序的请求会被转发到 Tomcat
+
+### Web 服务器和 Tomcat 应用服务器之间的通信方式
+
+- 使用 HTTP 协议，web 服务器将会做一个 HTTP 重定向到 Tomcat 服务器
+- 使用某些插件，例如仅适用于 apache 的 mode_jk 插件，该插件使用特殊协议在 apache 和 tomcat 之间进行通信
+
+## 9-4 安装 Nginx 服务器
+
+### Nginx
+
+- 高性能、轻量级、功能丰富、配置简单。用 C 语言写的
+- Apache、Nginx、IIS 并成为 “服务器三巨头”
+- 相比 apache ，Nginx 更适合高并发场景
+- apache 阻塞型、同步多进程。Nginx 异步、非阻塞、事件驱动
+- 安装：**yum install epel-release**  然后 **yum install nginx**
+- 开机启动：systemctl enable nginx
+- 启动：**nginx** 或 **systemctl start nginx**
+- 启动的时候可能会出错，因为 nginx 和 apache 一样默认都是绑定了 80 端口，我们可以先把 apache 停掉然后再去启动 nginx 。
+
+## 9-5 配置 nginx 作为反向代理服务器，虚拟主机配置，设置 HTTPS
+
+### 配置 Nginx
+
+```shell
+# 首先让 apache 监听其他服务，不要默认监听 80 端口，进入 apache 的主配置文件
+vim /etc/httpd/conf/httpd.conf
+```
+
+`/etc/httpd/conf/httpd.conf`
+
+```shell
+# 修改下面监听的端口
+Listen 7808 http
+```
+
+```shell
+# 然后让 apache 的 https 不要监听 443 端口
+vim /etc/httpd/conf.d/ssl.conf
+```
+
+`/etc/httpd/conf.d/ssl.conf`
+
+```shell
+Listen 7443 https
+```
+
