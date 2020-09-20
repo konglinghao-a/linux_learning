@@ -389,3 +389,47 @@ acl deny_file urlpath_regex -i \.rar$ \.avi$ \.zip$
 http_access deny deny_file
 ```
 
+## 9-8 安装 Docker 容器引擎
+
+### Docker
+
+- dock 表示 “码头”，docker 是 "码头工人" 的意思
+- Docker 是一个容器（container）引擎
+- [容器和虚拟机的区别](https://www.zhihu.com/question/48174633)
+- 安装可以看[官网安装教程](https://docs.docker.com/engine/install/centos/)
+
+## 9-9 如何进入救援模式，忘记 root 密码怎么办
+
+### 救援模式
+
+- 因某些修改操作，导致系统重启后无法正常启动
+- 可以进入救援模式，修改错误，再重新启动即可
+
+### 忘记 root 密码咋办
+
+- 可以在救援模式里修改 root 密码
+
+```shell
+# 第一步，开机的时候按 e 键
+
+# 第二步，找到 crashkernel，在它前面加上这么一句：(把 ro 改成 rw)
+rw init=/sysroot/bin/sh
+
+# 第三步：按 ctrl + x 重新启动，这样就可以进入救援模式
+
+# 第四步：把 /sysroot 目录作为根目录
+chroot /sysroot # 这样运行 whoami 就能看见是个 root
+
+# 第五步：关掉 selinux，不要让它捣蛋
+vim /etc/selinux/config
+# 进去之后，修改： SELINUX=permissive
+# 这样修改才是真的修改，因为 setenforce 0 只是暂时修改
+
+# 第六步：修改密码
+passwd root
+
+# 第七步：退出，重启
+exit
+reboot
+```
+
