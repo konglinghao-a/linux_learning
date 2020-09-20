@@ -296,3 +296,96 @@ server {
 ```
 
 ## 9-7 安装 Squid 作为代理服务器
+
+### 代理缓存
+
+- proxy-cache
+- 代理缓存服务器有多种不同的形式
+- 放在客户端，是个**正向代理**
+- 使用代理缓存可以让用户获得更快的资源访问，也节省带宽
+- 代理缓存的另一个优点是它可以授权或禁止访问某些在线资源，比如，网站、端口、服务，等。可以为整个局域网设置全局的**安全**策略（所以公司就可以禁止员工网购嘞）
+
+### 使用代理缓存的几种方法
+
+- 代理缓存的使用可以是可选的，非强制的，也就是说不通过代理而直接访问互联网也是被许可的。
+- 代理缓存的使用可以是强制且显式（explicit）的，也就是说访问互联网的唯一方法是通过代理缓存，但是用户必须手动配置其浏览器（或其他应用程序）
+- 代理缓存的使用可以是强制且隐式（implicit）的，也就是说访问互联网的唯一方法是通过代理缓存，但用户无需配置其浏览器，以透明方式通过代理缓存来连接。
+
+### 安装 Squid 代理缓存服务器
+
+- Squid 既可以配置为正向代理服务器，也可以配置为反向代理服务器。
+- Squid 默认监听 **3128 端口**。
+- 安装：**yum install squid**
+- 开机自动启动：**systemctl enable squid**
+- 启动：**systemctl start squid**
+- 启动了以后啥都不用干就能使用它基本的代理服务器的功能。
+
+### Squid 的配置文件
+
+- 主配置文件：**/etc/squid/squid.conf**
+- 筛选此文件的内容：
+
+```shell
+# -v：反向的意思，选出不匹配后面的表达式的内容
+# -E：使用正则表达式
+# ^$：这是匹配空行的意思
+grep -vE "^#|^$" /etc/squid/squid.conf
+```
+
+### http_port 指令
+
+- 指定 Squid 监听的地址和端口
+- 默认情况下，Squid 监听 3128 端口上的所有网络接口
+- 可以配置多个 http_port 指令，以便 Squid 监听多个地址或端口
+
+### coredump_dir 指令
+
+- 指定 Squid 可以向其中写入 core 错误文件的目录
+
+### refresh_pattern 指令
+
+- 指定了确定文件是 “比较新” 还是 “陈旧” 的规则
+- “陈旧” 的文件将被从缓存中删除
+
+### acl  指令
+
+- Access Control Lists，表示 “访问控制列表”，是访问控制的规则，这些规则之后将被 http_access 使用，用于根据这些规则允许或禁止连接
+- 命令格式：**acl acl名称 acl类型 acl值**
+  - 具有相同 acl 名称的多个 acl 指令将叠加每个指令的条件
+  - acl 类型有很多，最重要的是 src、dst（destination）、port、time
+  - 根据 acl 的类型，值可以是网络地址，端口，等等
+
+### http_access 指令
+
+- http_access 指令后接 allow 或 deny ，然后接被评估或拒绝访问的 ACL 的名称
+- 用于控制对代理缓存的访问
+- 最后一个字段是将被评估允许或拒绝访问的 ACL 的名称
+- 由于 http_access 是一行一行往下匹配，所以最后一行推荐写：**http_access deny all**
+
+### 配置自己的规则
+
+`/etc/squid/squid.conf`
+
+```shell
+# 定义了个规则，叫做 client
+acl client src 192.168.1.101 
+
+# 从这个 ip 地址去连接我们的缓存服务器是被 allow 的
+http_access allow client
+http_access deny all
+```
+
+- 然后重启 squid 服务：**systemctl restart squid**（下面也是一样，修改了配置文件以后就要重启）
+
+```shell
+acl deny_keyword url_regex -i kong
+# 只要访问的网址中，包含了 kong ，那么它就被禁止访问
+http_access deny deny_keyword
+```
+
+```shell
+acl deny_file urlpath_regex -i \.rar$ \.avi$ \.zip$
+# 不能下载指定结尾的文件
+http_access deny deny_file
+```
+
