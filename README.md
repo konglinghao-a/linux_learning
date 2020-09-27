@@ -1,7 +1,5 @@
 ## 这是我学习 Linux 的一段旅程 =w=
 
-学习 linux 做的笔记 ^_^  。学习网址在[这里](https://coding.imooc.com/class/386.html)。
-
 ### [1、Linux的安装与配置](./1、Linux的安装与配置.md)
 
 ### [2、Linux基础知识和命令](./2、Linux基础知识和命令.md)
