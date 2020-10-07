@@ -271,7 +271,7 @@ Host linghao
 - 第一步：在客户机中生成密钥对（公钥和私钥）
   - 用命令：**ssh-keygen**（默认使用 RSA 非对称加密算法），这条命令等价于 **ssh-keygen -t rsa**
   - 在 ~/.ssh/ 目录下，会新生成两个文件：
-    - **id_rsa.pnb**：公钥
+    - **id_rsa.pub**：公钥
     - **id_ras**：私钥
 
 ![](./media/84.png)
